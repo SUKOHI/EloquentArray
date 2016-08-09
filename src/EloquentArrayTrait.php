@@ -4,23 +4,68 @@ use \Sukohi\EloquentArray;
 
 trait EloquentArrayTrait {
 
-	public function saveArrayItem($keys = null) {
+    private $eloquent_array_init_flag = false;
+    private $eloquent_array_data = [];
 
-		if(is_null($keys)) {
+    // Relationships
 
-			$keys = array_keys($this->casts);
+    public function array_values() {
 
-		} else if(!is_array($keys)) {
+        return $this->hasMany('Sukohi\EloquentArray\EloquentArrayItem', 'parent_id', 'id');
 
-			$keys = [$keys];
+    }
 
-		}
+    public function getArray($key) {
 
-		$this->deleteArrayItem($this->id);
+        $this->loadEloquentArray();
+        return array_get($this->eloquent_array_data, $key, []);
 
-		foreach ($keys as $key) {
+    }
 
-			foreach ($this->$key as $value) {
+    public function getAllArray() {
+
+        $this->loadEloquentArray();
+        return $this->eloquent_array_data;
+
+    }
+
+    public function setArray($key, $values) {
+
+        $this->loadEloquentArray();
+        $this->eloquent_array_data[$key] = $values;
+
+    }
+
+    public function setAllArray($data) {
+
+        $this->loadEloquentArray();
+        $this->eloquent_array_data = $data;
+
+    }
+
+    public function unsetArray($key) {
+
+        $this->loadEloquentArray();
+        unset($this->eloquent_array_data[$key]);
+
+    }
+
+	public function saveArray() {
+
+        $this->loadEloquentArray();
+
+	    if(empty($this->id)) {
+
+	        return false;
+
+        }
+
+	    $data = $this->eloquent_array_data;
+		$this->clearArray();
+
+		foreach($data as $key => $values) {
+
+			foreach ($values as $value) {
 
 				$array_item = new EloquentArrayItem([
 					'model' => __CLASS__,
@@ -34,11 +79,27 @@ trait EloquentArrayTrait {
 
 		}
 
+        $this->eloquent_array_data = $data;
+        return true;
+
 	}
 
-	public function deleteArrayItem($id) {
+	public function deleteArray($key) {
 
-		return EloquentArrayItem::where('parent_id', $id)
+	    $this->unsetArray($key);
+        return EloquentArrayItem::where('parent_id', $this->id)
+            ->where('key', $key)
+            ->where('model', __CLASS__)
+            ->delete();
+
+    }
+
+	public function clearArray() {
+
+        $this->loadEloquentArray();
+        $this->eloquent_array_data = [];
+
+		return EloquentArrayItem::where('parent_id', $this->id)
 			->where('model', __CLASS__)
 			->delete();
 
@@ -61,43 +122,26 @@ trait EloquentArrayTrait {
 
 	}
 
-	public static function refreshArray($keys) {
+	private function loadEloquentArray() {
 
-		if(!is_array($keys)) {
+	    if(!$this->eloquent_array_init_flag) {
 
-			$keys = [$keys];
+            $this->eloquent_array_init_flag = true;
+            $this->load('array_values');
+            $this->eloquent_array_data = [];
 
-		}
+            if($this->array_values->count() > 0) {
 
-		foreach ($keys as $key) {
+                foreach ($this->array_values as $item) {
 
-			EloquentArrayItem::where('key', $key)
-				->where('model', __CLASS__)
-				->delete();
+                    $this->eloquent_array_data[$item->key][] = $item->value;
 
-			$items = with(new self)->select('id', $key)->get();
+                }
 
-			if($items->count() > 0) {
+            }
 
-				foreach ($items as $item) {
+        }
 
-					foreach ($item->$key as $value) {
-
-						$new_item = new EloquentArrayItem;
-						$new_item->model = __CLASS__;
-						$new_item->parent_id = $item->id;
-						$new_item->key = $key;
-						$new_item->value = $value;
-						$new_item->save();
-
-					}
-
-				}
-
-			}
-
-		}
-
-	}
+    }
 
 }
