@@ -80,6 +80,9 @@ All of the array values related to an item will be removed.
     $rock_band = \App\RockBand::find(1);
     $array = $rock_band->getArray('members');
 
+    // or
+    
+    $array = $rock_band->getAllArray();
 
 # Where Clause
 
