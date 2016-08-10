@@ -16,6 +16,7 @@ class CreateEloquentArrayItems extends Migration
 			$table->increments('id');
 			$table->string('model')->index();
 			$table->integer('parent_id')->unsigned()->index();
+			$table->string('name')->index();
 			$table->string('key')->index();
 			$table->text('value');
 		});

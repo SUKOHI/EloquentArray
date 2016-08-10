@@ -6,7 +6,7 @@ This package is only for Laravel 5.2+.
 
 Execute the following command.
 
-    composer require sukohi/eloquent-array:3.*
+    composer require sukohi/eloquent-array:4.*
     
 then set EloquentArrayServiceProvider in your config/app.php.
 
@@ -16,7 +16,7 @@ then set EloquentArrayServiceProvider in your config/app.php.
 
 Execute the following command to publish and migrate the migration.
 
-    php artisan vendor:publish
+    php artisan vendor:publish --provider="Sukohi\EloquentArray\EloquentArrayServiceProvider"
     php artisan migrate
     
 Then set `EloquentArrayTrait` in your model like so.
@@ -28,71 +28,99 @@ Then set `EloquentArrayTrait` in your model like so.
     use Illuminate\Database\Eloquent\Model;
     use Sukohi\EloquentArray\EloquentArrayTrait;
     
-    class RockBand extends Model
+    class Item extends Model
     {
         use EloquentArrayTrait;
     }
 
 # Usage
 
-### Save
+### Set
 
-    $rock_band->name = 'The Beatles';
-    $rock_band->setArray('members', [
-         'John Lennon', 
-         'Paul McCartney', 
-         'George Harrison', 
-         'Ringo Starr'
+    $item = \App\Item::find(1);
+    $item->setArray('locales', [
+        'en' => 'English',
+        'es' => 'Spanish',
+        'ja' => 'Japanese'
     ]);
-    $rock_band->save();
-    $rock_band->saveArray();
+    $item->saveArray();
+    
+### Unset
+
+    $item->unsetArray('locales'); // Remove `locales`
+    $item->saveArray();
     
     // Or
-
-    $rock_band->name = 'The Beatles';
-    $rock_band->setAllArray([
-        'members' => [
-            'John Lennon', 
-            'Paul McCartney', 
-            'George Harrison', 
-            'Ringo Starr'
-        ]
-    ]);
-    $rock_band->save();
-    $rock_band->saveArray();
     
+    $item->unsetArray('locales', 'en'); // Remove `en`
+    $item->saveArray();
+
 ### Delete
 
 A specific array values related to an item will be removed.
 
-    $rock_band = \App\RockBand::find(1);
-    $rock_band->deleteArray('members');
+    \App\Item::find(1)->deleteArray('locales');
     
 ### Clear
 
 All of the array values related to an item will be removed.
 
-    $rock_band = \App\RockBand::find(1);
-    $rock_band->clearArray();
+    \App\Item::find(1)->clearArray();
 
-### Retrieve
+### Retrieve 
 
-    $rock_band = \App\RockBand::find(1);
-    $array = $rock_band->getArray('members');
+***with Key***
 
-    // or
+    $item = \App\Item::find(1);
+    $array = $item->getArray('locales');
+
+    /* 
     
-    $array = $rock_band->getAllArray();
+        Array
+        (
+            [en] => English
+            [es] => Spanish
+            [ja] => Japanese
+        )
+    
+    */
+
+***without Key***
+    
+    $array = $item->getArray('locales', false);
+    
+    /* 
+    
+        Array
+        (
+            [0] => English
+            [1] => Spanish
+            [2] => Japanese
+        )
+    
+    */
+
+***All values***
+
+    $array = $item->getAllArray();
+
+***A Specific Value***
+
+    echo $item->getArrayValue('locales', 'en'); // English
+
+    // with Default Value
+    
+    echo $item->getArrayValue('locales', 'en', 'Default-Value');
 
 # Where Clause
 
 You can use whereArray() method to filter your data like so.
 
-    $rock_bands = \App\RockBand::whereArray('instruments', 'drums')->get();
+    $rock_bands = \App\Item::whereArray('instruments', 'drums')->get();
     
     // or
     
-    $rock_bands = \App\RockBand::where('id', 1)
+    $rock_bands = \App\Item::where('id', 1)
         ->orWhereArray('instruments', 'guitar')
         ->get();
     

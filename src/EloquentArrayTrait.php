@@ -15,10 +15,25 @@ trait EloquentArrayTrait {
 
     }
 
-    public function getArray($key) {
+    public function getArray($name, $with_key = true) {
 
         $this->loadEloquentArray();
-        return array_get($this->eloquent_array_data, $key, []);
+        $array = array_get($this->eloquent_array_data, $name, []);
+
+        if($with_key) {
+
+            return $array;
+
+        }
+
+        return array_values($array);
+
+    }
+
+    public function getArrayValue($name, $key, $default = '') {
+
+        $array = $this->getArray($name);
+        return array_get($array, $key, $default);
 
     }
 
@@ -29,10 +44,10 @@ trait EloquentArrayTrait {
 
     }
 
-    public function setArray($key, $values) {
+    public function setArray($name, $values) {
 
         $this->loadEloquentArray();
-        $this->eloquent_array_data[$key] = $values;
+        $this->eloquent_array_data[$name] = $values;
 
     }
 
@@ -43,10 +58,19 @@ trait EloquentArrayTrait {
 
     }
 
-    public function unsetArray($key) {
+    public function unsetArray($name, $key = '') {
 
         $this->loadEloquentArray();
-        unset($this->eloquent_array_data[$key]);
+
+        if(empty($key)) {
+
+            unset($this->eloquent_array_data[$name]);
+
+        } else {
+
+            unset($this->eloquent_array_data[$name][$key]);
+
+        }
 
     }
 
@@ -63,13 +87,14 @@ trait EloquentArrayTrait {
 	    $data = $this->eloquent_array_data;
 		$this->clearArray();
 
-		foreach($data as $key => $values) {
+		foreach($data as $name => $values) {
 
-			foreach ($values as $value) {
+			foreach ($values as $key => $value) {
 
 				$array_item = new EloquentArrayItem([
 					'model' => __CLASS__,
 					'parent_id' => $this->id,
+					'name' => $name,
 					'key' => $key,
 					'value' => $value
 				]);
@@ -84,11 +109,11 @@ trait EloquentArrayTrait {
 
 	}
 
-	public function deleteArray($key) {
+	public function deleteArray($name) {
 
-	    $this->unsetArray($key);
+	    $this->unsetArray($name);
         return EloquentArrayItem::where('parent_id', $this->id)
-            ->where('key', $key)
+            ->where('name', $name)
             ->where('model', __CLASS__)
             ->delete();
 
@@ -105,10 +130,10 @@ trait EloquentArrayTrait {
 
 	}
 
-	public function scopeWhereArray($query, $key, $operator = null, $value = null, $boolean = 'and') {
+	public function scopeWhereArray($query, $name, $operator = null, $value = null, $boolean = 'and') {
 
 		$ids = EloquentArrayItem::distinct()
-			->where('key', $key)
+			->where('name', $name)
 			->where('model', __CLASS__)
 			->where('value', $operator, $value)
 			->lists('parent_id');
@@ -134,7 +159,9 @@ trait EloquentArrayTrait {
 
                 foreach ($this->array_values as $item) {
 
-                    $this->eloquent_array_data[$item->key][] = $item->value;
+                    $name = $item->name;
+                    $key = $item->key;
+                    $this->eloquent_array_data[$name][$key] = $item->value;
 
                 }
 
