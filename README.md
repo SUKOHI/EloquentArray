@@ -116,12 +116,12 @@ All of the array values related to an item will be removed.
 
 You can use whereArray() method to filter your data like so.
 
-    $rock_bands = \App\Item::whereArray('instruments', 'drums')->get();
+    $items = \App\Item::whereArray('locales', 'en')->get();
     
     // or
     
-    $rock_bands = \App\Item::where('id', 1)
-        ->orWhereArray('instruments', 'guitar')
+    $items = \App\Item::where('id', 1)
+        ->orWhereArray('locales', 'en')
         ->get();
     
 # License
