@@ -141,11 +141,28 @@ trait EloquentArrayTrait {
 
 	}
 
-	public function scopeOrWhereArray($query, $column, $operator = null, $value = null) {
+	public function scopeOrWhereArray($query, $name, $operator = null, $value = null) {
 
-		return $this->scopeWhereArray($query, $column, $operator, $value, 'or');
+		return $this->scopeWhereArray($query, $name, $operator, $value, 'or');
 
 	}
+
+	public function scopeOrderByArray($query, $name, $direction = 'asc') {
+
+        $ids = EloquentArrayItem::where('name', $name)
+            ->where('model', __CLASS__)
+            ->orderBy('value', $direction)
+            ->lists('id');
+
+        if($ids->count() == 0) {
+
+            return $query;
+
+        }
+
+        return $query->orderBy(\DB::raw('FIELD(id, '. $ids->implode(',') .')'));
+
+    }
 
 	private function loadEloquentArray() {
 

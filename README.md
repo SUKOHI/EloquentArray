@@ -123,7 +123,18 @@ You can use whereArray() method to filter your data like so.
     $items = \App\Item::where('id', 1)
         ->orWhereArray('locales', 'en')
         ->get();
+
+# Order by Clause
+
+You can use array items name for `ORDER BY` like so.
+
+    $items = \App\Item::orderByArray('locales')->get();         // asc
+    $items = \App\Item::orderByArray('locales', 'asc')->get();
     
+    // or
+    
+    $items = \App\Item::orderByArray('locales', 'desc')->get();
+
 # License
 
 This package is licensed under the MIT License.  
