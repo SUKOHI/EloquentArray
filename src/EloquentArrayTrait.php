@@ -137,6 +137,13 @@ trait EloquentArrayTrait {
 			->where('model', __CLASS__)
 			->where('value', $operator, $value)
 			->lists('parent_id');
+
+        if($ids->count() == 0) {
+
+            return $query;
+
+        }
+
 		return $query->whereIn('id', $ids, $boolean);
 
 	}
