@@ -128,12 +128,12 @@ You can use whereArray() method to filter your data like so.
 
 You can use array items name for `ORDER BY` like so.
 
-    $items = \App\Item::orderByArray('locales')->get();         // asc
-    $items = \App\Item::orderByArray('locales', 'asc')->get();
+    $items = \App\Item::orderByArray('names', 'en')->get();         // asc
+    $items = \App\Item::orderByArray('names', 'en', 'asc')->get();
     
     // or
     
-    $items = \App\Item::orderByArray('locales', 'desc')->get();
+    $items = \App\Item::orderByArray('names', 'en', 'desc')->get();
 
 # License
 
