@@ -154,12 +154,13 @@ trait EloquentArrayTrait {
 
 	}
 
-	public function scopeOrderByArray($query, $name, $direction = 'asc') {
+	public function scopeOrderByArray($query, $name, $key, $direction = 'asc') {
 
         $ids = EloquentArrayItem::where('name', $name)
             ->where('model', __CLASS__)
+            ->where('key', $key)
             ->orderBy('value', $direction)
-            ->lists('id');
+            ->lists('parent_id');
 
         if($ids->count() == 0) {
 
@@ -167,6 +168,8 @@ trait EloquentArrayTrait {
 
         }
 
+        $other_ids = self::whereNotIn('id', $ids)->lists('id');
+        $ids = $ids->merge($other_ids);
         return $query->orderBy(\DB::raw('FIELD(id, '. $ids->implode(',') .')'));
 
     }
