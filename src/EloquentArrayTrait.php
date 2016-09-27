@@ -11,7 +11,8 @@ trait EloquentArrayTrait {
 
     public function array_values() {
 
-        return $this->hasMany('Sukohi\EloquentArray\EloquentArrayItem', 'parent_id', 'id');
+        return $this->hasMany('Sukohi\EloquentArray\EloquentArrayItem', 'parent_id', 'id')
+            ->where('model', __CLASS__);
 
     }
 
