@@ -135,6 +135,19 @@ You can use array items name for `ORDER BY` like so.
     
     $items = \App\Item::orderByArray('names', 'en', 'desc')->get();
 
+# Model
+
+[Save]
+
+    $item->setModelArray([
+        'App\User' => [1, 2, 3, 4, 5]   // Model IDs
+    ]);
+    $item->saveArray();
+
+[Retrieve]
+
+    $users = $item->getModelArray('App\User');
+
 # License
 
 This package is licensed under the MIT License.  

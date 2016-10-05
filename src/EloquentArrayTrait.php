@@ -75,6 +75,56 @@ trait EloquentArrayTrait {
 
     }
 
+    public function setModelArray($data) {
+
+        foreach ($data as $model => $values) {
+
+            if(!class_exists($model)) {
+
+                throw new \Exception('"'. $model .'" does not exist.');
+
+            }
+
+            $model_key = $this->getEloquentArrayModelKey($model);
+
+            foreach ($values as $id) {
+
+                $this->eloquent_array_data[$model_key][$id] = $model;
+
+            }
+
+        }
+
+    }
+
+    public function getModelArray($model) {
+
+        $model_key = $this->getEloquentArrayModelKey($model);
+        $models = array_get($this->eloquent_array_data, $model_key, []);
+        $ids = [];
+
+        foreach ($models as $id => $model) {
+
+            $ids[] = $id;
+
+        }
+
+        $query = $model::select();
+
+        if(count($models) == 0) {
+
+            $query->where('id', -1);
+
+        } else {
+
+            $query->whereIn('id', $ids);
+
+        }
+
+        return $query->get();
+
+    }
+
 	public function saveArray() {
 
         $this->loadEloquentArray();
@@ -196,6 +246,12 @@ trait EloquentArrayTrait {
             }
 
         }
+
+    }
+
+    private function getEloquentArrayModelKey($model) {
+
+        return 'models_'. md5($model);
 
     }
 
