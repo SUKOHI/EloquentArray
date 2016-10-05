@@ -77,6 +77,8 @@ trait EloquentArrayTrait {
 
     public function setModelArray($data) {
 
+        $this->loadEloquentArray();
+
         foreach ($data as $model => $values) {
 
             if(!class_exists($model)) {
@@ -99,6 +101,7 @@ trait EloquentArrayTrait {
 
     public function getModelArray($model) {
 
+        $this->loadEloquentArray();
         $model_key = $this->getEloquentArrayModelKey($model);
         $models = array_get($this->eloquent_array_data, $model_key, []);
         $ids = [];
