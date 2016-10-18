@@ -177,7 +177,7 @@ trait EloquentArrayTrait {
         }
 
         if(count($ids) > 0) {
-echo '<pre>'. print_r($ids, true) .'</pre>';
+
             $query->orderByRaw(\DB::raw('FIELD(id, '. implode(',', $ids) .')'));
 
         }
