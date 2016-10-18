@@ -81,17 +81,60 @@ trait EloquentArrayTrait {
 
         foreach ($data as $model => $values) {
 
-            if(!class_exists($model)) {
-
-                throw new \Exception('"'. $model .'" does not exist.');
-
-            }
-
+            $this->checkModelExistence($model);
             $model_key = $this->getEloquentArrayModelKey($model);
 
             foreach ($values as $id) {
 
                 $this->eloquent_array_data[$model_key][$id] = $model;
+
+            }
+
+        }
+
+    }
+
+    public function unsetModelArray($data) {
+
+        $this->loadEloquentArray();
+
+        foreach ($data as $model => $values) {
+
+            $this->checkModelExistence($model);
+            $model_key = $this->getEloquentArrayModelKey($model);
+
+            foreach ($values as $id) {
+
+                if(isset($this->eloquent_array_data[$model_key][$id])) {
+
+                    unset($this->eloquent_array_data[$model_key][$id]);
+
+                }
+
+            }
+
+        }
+
+    }
+
+    public function clearModelArray($models) {
+
+        $this->loadEloquentArray();
+
+        if(!is_array($models)) {
+
+            $models = [$models];
+
+        }
+
+        foreach ($models as $model) {
+
+            $this->checkModelExistence($model);
+            $model_key = $this->getEloquentArrayModelKey($model);
+
+            if(isset($this->eloquent_array_data[$model_key])) {
+
+                unset($this->eloquent_array_data[$model_key]);
 
             }
 
@@ -255,6 +298,16 @@ trait EloquentArrayTrait {
     private function getEloquentArrayModelKey($model) {
 
         return 'models_'. md5($model);
+
+    }
+
+    private function checkModelExistence($model) {
+
+        if(!class_exists($model)) {
+
+            throw new \Exception('"'. $model .'" does not exist.');
+
+        }
 
     }
 

@@ -144,6 +144,26 @@ You can use array items name for `ORDER BY` like so.
     ]);
     $item->saveArray();
 
+[Unset]
+
+    $item->unsetModelArray([
+        'App\User' => [2, 3]   // Model IDs
+    ]);
+    $item->saveArray();
+
+[Clear]
+
+    $item->clearModelArray('App\User');
+    $item->saveArray();
+    
+    // or
+    
+    $item->clearModelArray([
+        'App\User',
+        'App\Item'
+    ]);
+    $item->saveArray();
+
 [Retrieve]
 
     $users = $item->getModelArray('App\User');
