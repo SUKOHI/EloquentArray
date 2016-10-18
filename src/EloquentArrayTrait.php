@@ -75,7 +75,15 @@ trait EloquentArrayTrait {
 
     }
 
-    public function setModelArray($data) {
+    public function setModelArray($model, $id) {
+
+        $this->loadEloquentArray();
+        $model_key = $this->getEloquentArrayModelKey($model);
+        $this->eloquent_array_data[$model_key][$id] = $model;
+
+    }
+
+    public function setAllModelArray($data) {
 
         $this->loadEloquentArray();
 
@@ -83,6 +91,7 @@ trait EloquentArrayTrait {
 
             $this->checkModelExistence($model);
             $model_key = $this->getEloquentArrayModelKey($model);
+            $this->eloquent_array_data[$model_key] = [];
 
             foreach ($values as $id) {
 
@@ -164,6 +173,12 @@ trait EloquentArrayTrait {
         } else {
 
             $query->whereIn('id', $ids);
+
+        }
+
+        if(count($ids) > 0) {
+echo '<pre>'. print_r($ids, true) .'</pre>';
+            $query->orderByRaw(\DB::raw('FIELD(id, '. implode(',', $ids) .')'));
 
         }
 

@@ -6,7 +6,7 @@ This package is only for Laravel 5.2+.
 
 Execute the following command.
 
-    composer require sukohi/eloquent-array:4.*
+    composer require sukohi/eloquent-array:5.*
     
 then set EloquentArrayServiceProvider in your config/app.php.
 
@@ -137,9 +137,14 @@ You can use array items name for `ORDER BY` like so.
 
 # Model
 
-[Save]
+[Set]
 
-    $item->setModelArray([
+    $item->setModelArray('App\User', 1);   // Model ID
+    $item->saveArray();
+    
+[Set Array]
+
+    $item->setAllModelArray([
         'App\User' => [1, 2, 3, 4, 5]   // Model IDs
     ]);
     $item->saveArray();
