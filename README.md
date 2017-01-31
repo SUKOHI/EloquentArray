@@ -1,12 +1,12 @@
 # EloquentArray
 A Laravel package to deal with array values that we can search through where clause.  
-This package is only for Laravel 5.2+.
+This package is only for Laravel 5.3+.
 
 # Installation
 
 Execute the following command.
 
-    composer require sukohi/eloquent-array:5.*
+    composer require sukohi/eloquent-array:6.*
     
 then set EloquentArrayServiceProvider in your config/app.php.
 

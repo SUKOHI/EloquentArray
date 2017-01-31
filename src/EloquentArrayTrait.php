@@ -248,7 +248,7 @@ trait EloquentArrayTrait {
 			->where('name', $name)
 			->where('model', __CLASS__)
 			->where('value', $operator, $value)
-			->lists('parent_id');
+			->pluck('parent_id');
 
         if($ids->count() == 0) {
 
@@ -272,7 +272,7 @@ trait EloquentArrayTrait {
             ->where('model', __CLASS__)
             ->where('key', $key)
             ->orderBy('value', $direction)
-            ->lists('parent_id');
+            ->pluck('parent_id');
 
         if($ids->count() == 0) {
 
@@ -280,7 +280,7 @@ trait EloquentArrayTrait {
 
         }
 
-        $other_ids = self::whereNotIn('id', $ids)->lists('id');
+        $other_ids = self::whereNotIn('id', $ids)->pluck('id');
         $ids = $ids->merge($other_ids);
         return $query->orderBy(\DB::raw('FIELD(id, '. $ids->implode(',') .')'));
 
